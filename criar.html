@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro de Pedido</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    /* Você pode adicionar estilos extras se necessário */
+  </style>
+  <script>
+    // Executa após o carregamento da página
+    document.addEventListener("DOMContentLoaded", function(){
+      // Autocomplete para o campo Cliente
+      const clientes = ["João Silva", "Maria Oliveira", "Carlos Santos", "Ana Souza", "Fernando Lima"];
+      const inputCliente = document.getElementById("cliente");
+      inputCliente.addEventListener("input", function(){
+        const filtro = inputCliente.value.toLowerCase();
+        const sugestoes = clientes.filter(cliente => cliente.toLowerCase().includes(filtro));
+        let lista = document.getElementById("lista-clientes");
+        lista.innerHTML = "";
+        sugestoes.forEach(cliente => {
+          let item = document.createElement("option");
+          item.value = cliente;
+          lista.appendChild(item);
+        });
+      });
+    });
+
+    // Variável para contar os painéis adicionados
+    let painelCount = 0;
+
+    // Mostra ou esconde os formulários de produção conforme o tipo escolhido
+    function mostrarFormulario() {
+      let tipo = document.getElementById("tipoProducao").value;
+      document.getElementById("formPainel").style.display = (tipo === "painel") ? "block" : "none";
+      document.getElementById("formTotem").style.display = (tipo === "totem") ? "block" : "none";
+    }
+
+    // Adiciona um novo painel como aba (tab)
+    function adicionarPainel() {
+      painelCount++;
+      
+      // Criação da nova aba
+      let tabNav = document.getElementById("painelTabs");
+      let newTabItem = document.createElement("li");
+      newTabItem.classList.add("nav-item");
+      newTabItem.innerHTML = `
+        <button class="nav-link" id="tab${painelCount}" data-bs-toggle="tab" data-bs-target="#painel${painelCount}" type="button">
+          Painel ${painelCount} <span class="text-danger" onclick="removerPainel(${painelCount}, event)">✖</span>
+        </button>
+      `;
+      // Insere a nova aba antes do botão "+ Adicionar Painel"
+      let addBtnItem = document.getElementById("addPainelBtn").parentElement;
+      tabNav.insertBefore(newTabItem, addBtnItem);
+      
+      // Criação do conteúdo da aba
+      let painelContainer = document.getElementById("painelContent");
+      let painelHTML = `
+        <div class="tab-pane fade" id="painel${painelCount}">
+          <div class="card p-3">
+            <h5>Painel ${painelCount}</h5>
+            <label class="form-label">Descrição do Painel:</label>
+            <input type="text" class="form-control">
+            
+            <label class="form-label mt-2">Largura e Altura (cm):</label>
+            <div class="d-flex gap-2">
+              <input type="number" class="form-control" placeholder="Largura">
+              <input type="number" class="form-control" placeholder="Altura">
+            </div>
+            
+            <label class="form-label mt-2">Tecido do Painel:</label>
+            <input type="text" class="form-control">
+            
+            <label class="form-label mt-2">Opções:</label>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input">
+              <label class="form-check-label">Overloque</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input">
+              <label class="form-check-label">Elástico</label>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input">
+              <label class="form-check-label">Bainha</label>
+            </div>
+            
+            <label class="form-label mt-2">Com Ilhós:</label>
+            <input type="number" class="form-control" placeholder="Quantidade">
+            
+            <label class="form-label mt-2">Tem emenda?</label>
+            <select class="form-select">
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+            
+            <label class="form-label mt-2">Posição da Emenda:</label>
+            <input type="text" class="form-control">
+            
+            <label class="form-label mt-2">Valor do Painel (R$):</label>
+            <input type="number" class="form-control" placeholder="0,00">
+          </div>
+        </div>
+      `;
+      painelContainer.innerHTML += painelHTML;
+      
+      // Ativa a nova aba automaticamente
+      let newTab = new bootstrap.Tab(document.getElementById(`tab${painelCount}`));
+      newTab.show();
+    }
+
+    // Remove um painel específico
+    function removerPainel(index, event) {
+      event.stopPropagation(); // Evita a ativação da aba ao clicar no "✖"
+      document.getElementById(`tab${index}`).parentElement.remove();
+      document.getElementById(`painel${index}`).remove();
+      
+      // Ativa a primeira aba disponível, se existir
+      let tabs = document.querySelectorAll("#painelTabs .nav-link");
+      if (tabs.length > 0) {
+        new bootstrap.Tab(tabs[0]).show();
+      }
+    }
+  </script>
+</head>
+<body class="p-4">
+  <div class="container border p-4 rounded">
+    <h4 class="mb-3">Cadastro de Pedido</h4>
+    <form>
+      <!-- Formulário de Cabeçalho -->
+      <div class="mb-4">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Número do Pedido:</label>
+            <input type="text" class="form-control" id="numPedido" placeholder="Gerado automaticamente" disabled>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Cliente:</label>
+            <input type="text" class="form-control" id="cliente" list="lista-clientes" placeholder="Digite para buscar">
+            <datalist id="lista-clientes"></datalist>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Data de Entrada:</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Data de Entrega:</label>
+            <input type="date" class="form-control">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Observação:</label>
+          <textarea class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      
+      <!-- Seção de Produção -->
+      <div class="mb-4">
+        <label for="tipoProducao" class="form-label">Tipo de Produção:</label>
+        <select id="tipoProducao" class="form-select" onchange="mostrarFormulario()">
+          <option value="">Selecione...</option>
+          <option value="painel">Painel</option>
+          <option value="totem">Totem</option>
+        </select>
+      </div>
+      
+      <!-- Formulário de Painel -->
+      <div id="formPainel" style="display: none;">
+        <h4>Painéis</h4>
+        <!-- Nav Tabs -->
+        <ul class="nav nav-tabs" id="painelTabs">
+          <!-- Botão para adicionar novo painel -->
+          <li class="nav-item">
+            <button type="button" class="nav-link active" id="addPainelBtn" onclick="adicionarPainel()">+ Adicionar Painel</button>
+          </li>
+        </ul>
+        <!-- Conteúdo das abas -->
+        <div class="tab-content mt-3" id="painelContent">
+          <!-- Os painéis adicionados aparecerão aqui -->
+        </div>
+      </div>
+      
+      <!-- Formulário de Totem (placeholder) -->
+      <div id="formTotem" style="display: none;">
+        <h4>Totem</h4>
+        <div class="card p-3">
+          <p>Formulário de Totem em desenvolvimento.</p>
+        </div>
+      </div>
+      
+      <!-- Botão para submeter o formulário -->
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary">Salvar Pedido</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
