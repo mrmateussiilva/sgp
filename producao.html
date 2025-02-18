@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Formulário de Produção</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body class="p-4">
+
+    <div class="container">
+        <h3 class="text-center mb-4">Formulário de Produção</h3>
+
+        <label for="tipoProducao" class="form-label">Tipo de Produção:</label>
+        <select id="tipoProducao" class="form-select" onchange="mostrarFormulario()">
+            <option value="">Selecione...</option>
+            <option value="painel">Painel</option>
+            <option value="totem">Totem</option>
+        </select>
+
+        <div id="formPainel" class="mt-4" style="display: none;">
+            <h4>Painéis</h4>
+            
+            <!-- Nav Tabs -->
+            <ul class="nav nav-tabs" id="painelTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" id="addPainelBtn" onclick="adicionarPainel()">+ Adicionar Painel</button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content mt-3" id="painelContent">
+                <!-- Painéis adicionados dinamicamente aparecerão aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let painelCount = 0;
+
+        function mostrarFormulario() {
+            let tipo = document.getElementById("tipoProducao").value;
+            document.getElementById("formPainel").style.display = (tipo === "painel") ? "block" : "none";
+        }
+
+        function adicionarPainel() {
+            painelCount++;
+
+            // Criando a aba (tab)
+            let tabNav = document.getElementById("painelTabs");
+            let newTab = document.createElement("li");
+            newTab.classList.add("nav-item");
+            newTab.innerHTML = `
+                <button class="nav-link" id="tab${painelCount}" data-bs-toggle="tab" data-bs-target="#painel${painelCount}" type="button">
+                    Painel ${painelCount} <span class="text-danger" onclick="removerPainel(${painelCount}, event)">✖</span>
+                </button>
+            `;
+            tabNav.insertBefore(newTab, tabNav.lastElementChild); // Adiciona antes do botão "+"
+
+            // Criando o conteúdo do painel
+            let painelContainer = document.getElementById("painelContent");
+            let painelHTML = `
+                <div class="tab-pane fade" id="painel${painelCount}">
+                    <div class="card p-3">
+                        <h5>Painel ${painelCount}</h5>
+                        <label class="form-label">Descrição do Painel:</label>
+                        <input type="text" class="form-control">
+
+                        <label class="form-label mt-2">Largura e Altura (cm):</label>
+                        <div class="d-flex gap-2">
+                            <input type="number" class="form-control" placeholder="Largura">
+                            <input type="number" class="form-control" placeholder="Altura">
+                        </div>
+
+                        <label class="form-label mt-2">Tecido do Painel:</label>
+                        <input type="text" class="form-control">
+
+                        <label class="form-label mt-2">Opções:</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input">
+                            <label class="form-check-label">Overloque</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input">
+                            <label class="form-check-label">Elástico</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input">
+                            <label class="form-check-label">Bainha</label>
+                        </div>
+
+                        <label class="form-label mt-2">Com Ilhós:</label>
+                        <input type="number" class="form-control" placeholder="Quantidade">
+
+                        <label class="form-label mt-2">Tem emenda?</label>
+                        <select class="form-select">
+                            <option value="nao">Não</option>
+                            <option value="sim">Sim</option>
+                        </select>
+
+                        <label class="form-label mt-2">Posição da Emenda:</label>
+                        <input type="text" class="form-control">
+
+                        <label class="form-label mt-2">Valor do Painel (R$):</label>
+                        <input type="number" class="form-control" placeholder="0,00">
+                    </div>
+                </div>
+            `;
+
+            painelContainer.innerHTML += painelHTML;
+
+            // Ativar a nova aba automaticamente
+            let newTabButton = document.getElementById(`tab${painelCount}`);
+            newTabButton.click();
+        }
+
+        function removerPainel(index, event) {
+            event.stopPropagation(); // Evita ativar a aba ao clicar no "✖"
+            document.getElementById(`tab${index}`).remove();
+            document.getElementById(`painel${index}`).remove();
+
+            // Ativar a primeira aba se houver outras ainda
+            let tabs = document.querySelectorAll("#painelTabs .nav-link");
+            if (tabs.length > 1) {
+                tabs[0].click();
+            }
+        }
+    </script>
+
+</body>
+</html>
